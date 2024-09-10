@@ -30,15 +30,14 @@ public class CustomerRequest {
     private boolean isActive;
     private LocalDateTime localDateTime;
     private Role role;
+    private String registeredByUser;
     private Company company;
     private CustomerReward customerReward;
 
-//    private int statusCode;
-//    private String error;
-//    private String message;
-//    private String token;
-//    private String refreshToken;
-//    private String expirationTime;
 
+
+    public void setPassword(String password) {
+        this.password = "password";
+    }
 }
 

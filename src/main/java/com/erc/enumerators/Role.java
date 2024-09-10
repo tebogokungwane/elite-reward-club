@@ -7,6 +7,12 @@ public enum Role {
     @JsonValue
     MANAGEMENT,
     ADMIN,
-    CUSTOMER;
+    CUSTOMER,
+    USER;
+
+    @JsonValue
+    public String toValue() {
+        return name();
+    }
 
 }

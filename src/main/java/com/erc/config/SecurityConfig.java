@@ -30,28 +30,30 @@ public class SecurityConfig {
     @Autowired
     private  JWTAuthFilter jwtAuthFilter;
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
                 .authorizeRequests(request -> request
                         .antMatchers("/auth/**", "/public/**").permitAll()
                         .antMatchers("/api/v1/signin").permitAll()
-                        .antMatchers("/api/v1/signUpAdmin").hasAnyRole(Role.MANAGEMENT.name())
-                        .antMatchers("/api/v1/signUpCustomer").hasAnyRole(Role.ADMIN.name())
-                        //.antMatchers("/api/v1/users").hasAnyRole(Role.ADMIN.name())
+                        .antMatchers("/api/v1/signUpAdmin").permitAll()
+                        .antMatchers("/api/v1/signUpCustomer").permitAll()
+                        .antMatchers("/api/v1/company/customers").permitAll()
+                        .antMatchers("/api/v1/deleteCustomer/*").permitAll()
                         .antMatchers("/api/v1/users").permitAll()
-
+                        .antMatchers("/api/v1/updateCustomer/**").permitAll()
                         .antMatchers("/api/v1/deleteCustomer").hasAnyRole(Role.ADMIN.name())
-                        .antMatchers("/api/v1/updateCustomer").hasAnyRole(Role.ADMIN.name())
+                        .antMatchers("/api/v1/updateCustomer/**").permitAll()
+                        .antMatchers("/api/v1/auth/authenticate/").permitAll()
                         .antMatchers("/api/v1/profile").permitAll()
-
+                        .antMatchers("/api/v1/profile/**").permitAll()
+                        .antMatchers("/api/v1/updateCustomerRewardPoints/**").permitAll()
+                        .antMatchers("/api/v1/updateMyCustomersTargetRewardPoint/**").permitAll()
                         .antMatchers("/search/{productType}").permitAll() // Adjusted to include path variable
+                        .antMatchers("/api/v1/forgot-password").permitAll()
                         .antMatchers("/filter").permitAll() // Adjusted to include path variable
-
-
-
                         .anyRequest().authenticated())
+                //.oauth2ResourceServer(oauth2 -> oauth2.jwt())
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authenticationProvider(authenticationProvider())

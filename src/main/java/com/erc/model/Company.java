@@ -13,16 +13,15 @@ import java.time.LocalDateTime;
 @Builder
 public class Company {
 
-
+    private long id;
     private String companyName;
     private String companyService;
     private boolean isActive;
     private String companyEmail;
     private String companyPhoneNumber;
     private String companyAddress;
-    private String companyCity;
-    private String companyPostalCode;
-   // private CompanyNetwork companyNetwork;
+    private String addedBy;
+    private int rewardTargetPoints;
     private LocalDateTime localDateTimeCreated;
 
 }

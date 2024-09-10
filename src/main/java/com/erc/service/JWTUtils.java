@@ -25,8 +25,11 @@ public class JWTUtils {
         this.key = new SecretKeySpec(keyByte, SignatureAlgorithm.HS512.getJcaName());
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails, String companyName) {
+        HashMap<String,Object> claim = new HashMap<>();
+        claim.put("companyName", companyName);
         return Jwts.builder()
+                .setClaims(claim)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
@@ -60,4 +63,15 @@ public class JWTUtils {
     public boolean isTokenExpired(String token) {
         return extractClaims(token, Claims::getExpiration).before(new Date());
     }
+
+    public String extractCompanyName(String token) {
+        // Assuming the company name is stored in the token's claims
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token.replace("Bearer ", ""))
+                .getBody();
+        return claims.get("companyName", String.class);
+    }
+
 }

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class CustomerReward {
 
     private String customerRewardEmailAddress;
-    private int setRewardPoints;
-    private int rewardPointToIncrement;
+    private long rewardPointsTarget;
+    private long rewardPointCurrent;
     private LocalDateTime localDateTime;
 }

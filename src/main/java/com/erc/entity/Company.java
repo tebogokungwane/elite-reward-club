@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @AllArgsConstructor
@@ -17,15 +18,9 @@ import java.time.LocalDateTime;
 public class Company {
 
     @Id
-    @SequenceGenerator(
-            name = "company_sequence",
-            sequenceName = "company_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,
-            generator = "company_sequence")
-    private long id;
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column( unique = true, nullable = false)
     private String companyName;
     private String companyService;
     private boolean isActive;
@@ -34,11 +29,23 @@ public class Company {
     private String companyAddress;
     private String companyCity;
     private String companyPostalCode;
-//    @OneToOne(
-//            cascade = CascadeType.PERSIST,
-//            fetch = FetchType.EAGER,
-//            mappedBy = "companyNetwork"
-//    )
-    //private CompanyNetwork companyNetwork;
+    private String addedBy;
+    @Column(name = "reward_target_points")
+    private Integer rewardTargetPoints;
+    @Column(name = "created_at")
     private LocalDateTime localDateTime;
+
+    @Column(name = "formatted_created_at")
+    private String formattedDate;
+
+    public void setLocalDateTime(LocalDateTime localDateTime) {
+        this.localDateTime = localDateTime;
+        this.formattedDate = formatDateTime(localDateTime);
+    }
+
+    private String formatDateTime(LocalDateTime localDateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy");
+        return localDateTime.format(formatter);
+    }
+
 }
