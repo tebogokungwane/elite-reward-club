@@ -1,6 +1,7 @@
 package com.erc.controller;
 
 import com.erc.entity.User;
+import com.erc.model.AdminRequest;
 import com.erc.model.CustomerRequest;
 import com.erc.model.ForgotPasswordRequest;
 import com.erc.repository.UserRepository;
@@ -44,15 +45,18 @@ public class UserController {
     private JWTUtils jwtUtils;
 
     @PostMapping("/signUpAdmin")
-     public ResponseEntity<User> createAdmin(@RequestBody CustomerRequest adminRequest) {//@AuthenticationPrincipal UserDetails userDetails
-        log.info("UserController::createAdmin() " + adminRequest);
+     public ResponseEntity<User> createAdmin(@RequestBody AdminRequest adminRequest) {
+        try {
+            log.info("UserController::createAdmin() " + adminRequest);
 
-        //Optional<User> registeredByUser = userRepository.findByEmailAddress(userDetails.getUsername());
+            User admin = userService.createAdmin(adminRequest);
+            return ResponseEntity.ok(admin);
+        } catch (Exception e) {
+            log.error("Error creating admin ", e);
 
-        //log.info("Find by email " + registeredByUser.get().getFirstName() + " " + registeredByUser.get().getLastName());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
-        User admin = userService.createAdmin(adminRequest);//registeredByUser
-        return ResponseEntity.ok(admin);
+        }
     }
 
     @PostMapping("/signUpCustomer")
@@ -117,6 +121,13 @@ public class UserController {
         userService.updateMyCustomersTargetRewardPoint(id,customer);
         return ResponseEntity.ok(customer);
     }
+
+    @PutMapping("/api/v1/updateCompany/{id}")
+    public ResponseEntity<CustomerRequest>updateCompany(@PathVariable long id, @RequestBody CustomerRequest customer){
+        userService.updateCompany(id,customer);
+        return ResponseEntity.ok(customer);
+    }
+
 
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request){

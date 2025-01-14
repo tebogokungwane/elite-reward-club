@@ -4,6 +4,7 @@ import com.erc.entity.Company;
 import com.erc.entity.CustomerReward;
 import com.erc.entity.User;
 import com.erc.enumerators.Role;
+import com.erc.model.AdminRequest;
 import com.erc.model.CompanyMapper;
 import com.erc.model.CustomerRequest;
 import com.erc.model.LoginRequest;
@@ -69,7 +70,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional
-    public User createAdmin(CustomerRequest adminRequest) {
+
+    public User createAdmin(AdminRequest adminRequest) {
 
         String defaultPassword = "password";
         String encodedPassword = passwordEncoder.encode(defaultPassword);
@@ -119,11 +121,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         User customer = new User();
 
-        Company company = CompanyMapper.mapToEntity(customerRequest.getCompany());
-
-        log.info("Request company object "+ company);
-
-        Company savedCompany = companyRepository.save(company);
+        String companyName = customerRequest.getCompany().getCompanyName();
+        Company existingCompany = companyRepository.findFirstByCompanyName(companyName)
+                .orElseThrow(() -> new IllegalStateException("Company name not found"));
 
         CustomerReward customerReward = CustomerReward.
                 builder()
@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .build();
 
         customer.setCustomerReward(customerReward);
-        customer.setCompany(savedCompany);
+        customer.setCompany(existingCompany);
         customer.setFirstName(customerRequest.getFirstName());
         customer.setLastName(customerRequest.getLastName());
         customer.setEmailAddress(customerRequest.getEmailAddress());
@@ -155,7 +155,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public LoginRequest signIn(LoginRequest customerRequest) {
         log.info("UserServiceImpl::signIn()");
-        //LoginRequest response = new LoginRequest();
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(customerRequest.getEmailAddress(), customerRequest.getPassword()));
             User user = userRepository.findByEmailAddress(customerRequest.getEmailAddress()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -269,6 +268,31 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
+
+    @Override
+    public User updateCompany(long id, CustomerRequest customer) {
+
+        Optional<User> byId = userRepository.findById(id);
+
+        if (byId.isEmpty()){
+            throw new IllegalArgumentException("Company not found");
+        }
+
+        User user = byId.get();
+        Company company = user.getCompany();
+
+        company.setCompanyName(customer.getCompany().getCompanyName());
+        company.setCompanyService(customer.getCompany().getCompanyService());
+        company.setCompanyEmail(customer.getCompany().getCompanyEmail());
+        company.setCompanyPhoneNumber(customer.getCompany().getCompanyPhoneNumber());
+        company.setCompanyAddress(customer.getCompany().getCompanyAddress());
+        company.setRewardTargetPoints(customer.getCompany().getRewardTargetPoints());
+
+        userRepository.save(user);
+
+        return user;
+    }
+
     public void sendPasswordResetToken(String emailAddress) {
         Optional<User> userOptional = userRepository.findByEmailAddress(emailAddress);
         if (userOptional.isEmpty()) {
@@ -333,6 +357,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         System.out.println("Query Results :"+ byCompanyEmail);
         return byCompanyEmail ;
     }
+
+
 
     private String capitalizeFirstNameFirstLetter() {
         String customer = request.getFirstName();

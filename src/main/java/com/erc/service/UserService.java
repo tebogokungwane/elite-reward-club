@@ -1,6 +1,7 @@
 package com.erc.service;
 
 import com.erc.entity.User;
+import com.erc.model.AdminRequest;
 import com.erc.model.CustomerRequest;
 import com.erc.model.LoginRequest;
 import org.springframework.data.domain.Page;
@@ -14,7 +15,10 @@ import java.util.List;
 
 public interface UserService {
 
-    User createAdmin(CustomerRequest adminRequest);
+    //User createAdmin(CustomerRequest adminRequest);
+
+    User createAdmin(AdminRequest adminRequest);
+
 
     User createCustomer(CustomerRequest userRequest) throws Exception;
 
@@ -38,4 +42,5 @@ public interface UserService {
     List<User> findByCompanyEmail(@Param("companyEmail") String companyEmail);
 
 
+    User updateCompany(long id, CustomerRequest customer);
 }

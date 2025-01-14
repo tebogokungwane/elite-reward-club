@@ -30,6 +30,8 @@ public class SecurityConfig {
     @Autowired
     private  JWTAuthFilter jwtAuthFilter;
 
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
@@ -49,6 +51,8 @@ public class SecurityConfig {
                         .antMatchers("/api/v1/profile/**").permitAll()
                         .antMatchers("/api/v1/updateCustomerRewardPoints/**").permitAll()
                         .antMatchers("/api/v1/updateMyCustomersTargetRewardPoint/**").permitAll()
+
+                        .antMatchers("/api/v1/updateCompany/**").permitAll()
                         .antMatchers("/search/{productType}").permitAll() // Adjusted to include path variable
                         .antMatchers("/api/v1/forgot-password").permitAll()
                         .antMatchers("/filter").permitAll() // Adjusted to include path variable

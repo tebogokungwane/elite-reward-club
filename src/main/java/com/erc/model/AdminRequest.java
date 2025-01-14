@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 
 public class AdminRequest {
+
     private Long customerId;
     private String firstName;
     private String lastName;
@@ -24,6 +25,7 @@ public class AdminRequest {
     private boolean isActive;
     private LocalDateTime localDateTime;
     private Role role;
+    private String registeredByUser;
     private Company company;
     private CustomerReward customerReward;
 }
