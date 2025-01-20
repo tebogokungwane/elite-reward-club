@@ -1,36 +1,32 @@
 package com.erc.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
-        // Return the error message with a BAD_REQUEST status (400)
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
+    public ResponseEntity<Error> handleIllegalStateException(IllegalStateException ex) {
+    Error error = new Error(
+            "USER_REGISTRATION_ERROR",
+            ex.getCause());
+    return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+
     }
 
-    // You can add more handlers for other exceptions if needed
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Error> handleGeneralException(Exception ex) {
+        Error error = new Error(
+                "INTERNAL_SERVER_ERROR",
+                ex.getCause());
 
-    // Define a simple ErrorResponse class if you don't already have one
-    public static class ErrorResponse {
-        private String error;
-
-        public ErrorResponse(String error) {
-            this.error = error;
-        }
-
-        public String getError() {
-            return error;
-        }
-
-        public void setError(String error) {
-            this.error = error;
-        }
+        log.error("Unhandled exception: {}", ex.getMessage(), ex);
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
 

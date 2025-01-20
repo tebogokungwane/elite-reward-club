@@ -4,6 +4,7 @@ import com.erc.entity.Company;
 import com.erc.entity.CustomerReward;
 import com.erc.entity.User;
 import com.erc.enumerators.Role;
+import com.erc.exception.ErrorCode;
 import com.erc.model.AdminRequest;
 import com.erc.model.CompanyMapper;
 import com.erc.model.CustomerRequest;
@@ -91,6 +92,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setEmailAddress(adminRequest.getEmailAddress());
         user.setPhoneNumber(adminRequest.getPhoneNumber());
 
+         userRepository.findByEmailAddress(
+                adminRequest.getEmailAddress())
+                .ifPresent(existingUser -> {
+                    throw new IllegalArgumentException(ErrorCode.USER_REGISTRATION_ERROR.getMessage(adminRequest.getEmailAddress()));
+                });
+
         if (adminRequest.getPassword() == null || adminRequest.getPassword().isEmpty()) {
             user.setPassword(encodedPassword);
         } else {
@@ -124,6 +131,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         String companyName = customerRequest.getCompany().getCompanyName();
         Company existingCompany = companyRepository.findFirstByCompanyName(companyName)
                 .orElseThrow(() -> new IllegalStateException("Company name not found"));
+
+        userRepository.findByEmailAddress(
+                        customerRequest.getEmailAddress())
+                .ifPresent(existingUser -> {
+                    throw new IllegalArgumentException("User already exist " + customerRequest.getEmailAddress());
+                });
 
         CustomerReward customerReward = CustomerReward.
                 builder()
